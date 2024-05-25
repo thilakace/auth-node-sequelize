@@ -1,0 +1,134 @@
+{
+	"info": {
+		"_postman_id": "18473645-77c0-4226-8891-0e25914ed76d",
+		"name": "test2505",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9046854"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\" : \"thilak\",\r\n    \"email\" :\"thilakazb@gmail.com\",\r\n    \"password\" :\"test123\",\r\n    \"status\" : 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Activate user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/users/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "doLogin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" :\"thilakazb@gmail.com\",\r\n    \"password\" :\"test1231\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/users/doLogin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"doLogin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetTimeApi",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/users/getTimeApi/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImtleSI6IjBieTBhIiwiaWF0IjoxNzE2NjUwMDAxLCJleHAiOjE3MTY2NTA2MDF9.vP033gFFJuDfIunEt_oXYiyiPzKAS5uU9ZeVly-EeWs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"getTimeApi",
+						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMSIsImtleSI6IjBieTBhIiwiaWF0IjoxNzE2NjUwMDAxLCJleHAiOjE3MTY2NTA2MDF9.vP033gFFJuDfIunEt_oXYiyiPzKAS5uU9ZeVly-EeWs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "KickoutApi",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/users/kickoutApi/thilakazb@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"users",
+						"kickoutApi",
+						"thilakazb@gmail.com"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
