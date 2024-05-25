@@ -29,7 +29,7 @@
 
 ### NPM Packages 
 ```
-* npm i expres
+* npm i express
 * npm i mysql
 * npm i sequelize
 * npm i jsonwebtoken
