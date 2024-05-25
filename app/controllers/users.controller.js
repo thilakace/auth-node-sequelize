@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = db.users;
 const UserSession = db.user_session;
 
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
     // Validate request
    
     if (!(req.body.email && req.body.password)){
@@ -21,32 +21,32 @@ exports.create = (req, res) => {
       return;
     }
 
+    
     // check if user alredy exist or not
-    User.findAll({ where: { email: req.body.email } })
-      .then(data => {
-        //console.log(data.length);
-        if (data.length >= 1){
-          res.status(400).send({
-            message: "User Already Exist!"
-          });
-          return;
-        }
-      });
 
-   
+    const userExist =  await User.findAll({ where: { email: req.body.email } });
+    if (userExist.length >= 1){
+      res.status(200).send({
+        message: "User already Exist"
+      });
+      return;
+    }
+
   
-    // Create a Tutorial
+    // Create a user
     const user = {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      status: req.body.password ? req.body.password : false
+      status: req.body.status ? req.body.status : false
     };
-  
+  console.log(user);
     // Save User in the database
     User.create(user)
       .then(data => {
-        res.send(data);
+        res.status(200).send({
+          message:  "Account has been created for user "+ req.body.name
+        });
       })
       .catch(err => {
         res.status(500).send({
@@ -70,7 +70,7 @@ exports.create = (req, res) => {
       });
   };
 
-  exports.doLogin = (req, res) => {
+  exports.doLogin = async (req, res) => {
     console.log("doLogin");
     if (!(req.body.email && req.body.password)){
       res.status(400).send({
@@ -79,11 +79,22 @@ exports.create = (req, res) => {
       return;
     }
 
+    const userExist =  await User.findAll({ where: { email: req.body.email } });
+    if (userExist.length == 0){
+      res.status(200).send({
+        message: "Invalid User!"
+      });
+      return;
+    }
+
+
     User.findAll({ where: { email: req.body.email, password : req.body.password, status : 1 } })
       .then(data => {
-        console.log(data[0].id);
-        var userId = data[0].id;
+       
+        
         if (data.length >= 1){
+          var userId = data[0].id;
+
           // generate authentication key
           let r = (Math.random() + 1).toString(36).substring(7);
 
@@ -99,16 +110,31 @@ exports.create = (req, res) => {
           })
           .catch(err => {
             res.status(500).send({
-              message: "Error updating Tutorial with id=" + id
+              message: "Error updating user"
             });
           });
 
           
         }else{
-          res.status(200).send({
-            message: "User not available"
-          });
-          return;
+          var attempt = userExist[0].lock_user;
+          console.log(attempt);
+          
+          if(attempt >= process.env.LOGIN_ATTEMPT){
+            User.update({status : 0},{where : {id : userExist[0].id}})
+            res.status(200).send({
+              message: "Account Locked!"
+            });
+            return;
+          }else{
+             User.update({lock_user : attempt+1},{where : {id : userExist[0].id}})
+            
+            res.status(200).send({
+              message: "Password incorrect!"
+            });
+            return;
+          }
+         
+          
         }
       })
       .catch(err => {
@@ -162,7 +188,8 @@ exports.create = (req, res) => {
           .then(num => {
             if (num == 1) {
               res.status(200).send({
-                message: "User login successfully"
+                message: "User login successfully",
+                token : token
               });
               return;
             } else {
@@ -184,4 +211,59 @@ exports.create = (req, res) => {
         });
       }
       })
+  };
+
+    exports.userActivate = (req, res) => {
+    const userId = req.params.id;
+    User.update({status : 1,lock_user:0},{where : {id : userId}}).then(nums => {
+      res.send({ message: `Account is enabled` });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred ."
+      });
+    });
+  };
+
+  exports.getTimeApi = async (req, res) => {
+    const token = req.params.token;
+    console.log(token);
+    try { 
+      // check token validation
+      const tokenExist =  await UserSession.findAll({ where: { token: token, session_status : 1 } });
+
+      if(tokenExist.length == 0){
+        res.status(401).send({ status: 'error', message: 'Unauthorized! Access Token was expired!' });
+      }
+
+      const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+      res.status(200).send({ status: 'success', message: 'Valid token', time : new Date() });
+      return;
+    } catch (error) {
+      res.status(401).send({ status: 'error', message: 'Unauthorized! Access Token was expired!' });
+      return;
+    }  
   }
+
+  exports.kickoutApi = async (req, res) => {
+    const user = req.params.user;
+    const userExist =  await User.findAll({ where: { email: user } });
+    console.log(userExist);
+    if(userExist.length > 0){
+      UserSession.update({session_status : 0},{where : {user_id : userExist[0].id }}).then(nums => {
+        res.send({ message: `All sessions are kicked out` });
+      })
+      .catch(err => {
+        res.status(500).send({
+          message:
+            err.message || "Some error occurred ."
+        });
+      });
+    }else{
+      res.status(401).send({ status: 'error', message: 'Invalid User or user not found!' });
+      return;
+    }
+  }
+
+  

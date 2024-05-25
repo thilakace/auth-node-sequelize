@@ -24,8 +24,12 @@ module.exports = app => {
   // // Create a new Tutorial
   // router.delete("/", users.deleteAll);
 
+  router.get("/activate/:id", users.userActivate);
   router.post("/doLogin", users.doLogin);
   router.get("/acceptLogin/:key/:id", users.acceptLogin);
+  router.get("/getTimeApi/:token", users.getTimeApi);
+  router.get("/kickoutApi/:user", users.kickoutApi);
+
 
   app.use('/api/users', router);
 };
